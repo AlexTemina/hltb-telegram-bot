@@ -1,7 +1,10 @@
 import TelegramBot, { InlineQueryResultArticle } from 'node-telegram-bot-api';
 import { HowLongToBeatEntry, HowLongToBeatService } from 'howlongtobeat';
+import dotenv from 'dotenv';
 
-const TOKEN = '1992836533:AAHkQNlcRHFLwkiBkmCgGIetK2C0SraJU7k';
+dotenv.config();
+
+const { BOT_TOKEN } = process.env;
 
 const getText = (gameData: HowLongToBeatEntry) =>
   `${gameData.name.toUpperCase()}: 
@@ -21,7 +24,7 @@ const gameDataToArticle = (
   input_message_content: { message_text: getText(gameData) },
 });
 
-const bot = new TelegramBot(TOKEN, { polling: true });
+const bot = new TelegramBot(BOT_TOKEN, { polling: true });
 const hltbService = new HowLongToBeatService();
 
 bot.on('inline_query', (inlineQuery) => {
