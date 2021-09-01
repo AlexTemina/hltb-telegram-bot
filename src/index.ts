@@ -2,18 +2,23 @@ import TelegramBot, { InlineQueryResultArticle } from 'node-telegram-bot-api';
 import { HowLongToBeatEntry, HowLongToBeatService } from 'howlongtobeat';
 import dotenv from 'dotenv';
 
+const HLTB_URL_BASE = 'https://howlongtobeat.com/';
+
 dotenv.config();
 
 const { BOT_TOKEN } = process.env;
 
-const getText = (gameData: HowLongToBeatEntry) =>
-  `${gameData.name.toUpperCase()}: 
+const getHLTBUrl = (id: string) => `${HLTB_URL_BASE}game?id=${id}`;
+const getHLTBImageUrl = (imageUrl: string) => `${HLTB_URL_BASE}${imageUrl}`;
 
-  Main: ${gameData.gameplayMain} h. 
-  Main + Extras: ${gameData.gameplayMainExtra} h. 
-  Completionist: ${gameData.gameplayCompletionist} h. 
-  
-  https://howlongtobeat.com/game?id=${gameData.id}`;
+const getText = (gameData: HowLongToBeatEntry) =>
+  `*${gameData.name.toUpperCase()}*
+
+*Main*: _${gameData.gameplayMain} h_
+*Main + Extras*: _${gameData.gameplayMainExtra} h_
+*Completionist*: _${gameData.gameplayCompletionist} h_
+
+${getHLTBUrl(gameData.id)}`;
 
 const gameDataToArticle = (
   gameData: HowLongToBeatEntry,
@@ -21,7 +26,14 @@ const gameDataToArticle = (
   type: 'article',
   id: gameData.id,
   title: gameData.name,
-  input_message_content: { message_text: getText(gameData) },
+  input_message_content: {
+    message_text: getText(gameData),
+    disable_web_page_preview: true,
+    parse_mode: 'markdown',
+  },
+  thumb_url: getHLTBImageUrl(gameData.imageUrl),
+  url: getHLTBUrl(gameData.id),
+  hide_url: true,
 });
 
 const bot = new TelegramBot(BOT_TOKEN, { polling: true });
