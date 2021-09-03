@@ -1,3 +1,4 @@
+import { escapeMarkdown } from './markdown-escape';
 import TelegramBot, { InlineQueryResultArticle } from 'node-telegram-bot-api';
 import { HowLongToBeatEntry, HowLongToBeatService } from 'howlongtobeat';
 import dotenv from 'dotenv';
@@ -11,14 +12,25 @@ const { BOT_TOKEN } = process.env;
 const getHLTBUrl = (id: string) => `${HLTB_URL_BASE}game?id=${id}`;
 const getHLTBImageUrl = (imageUrl: string) => `${HLTB_URL_BASE}${imageUrl}`;
 
-const getText = (gameData: HowLongToBeatEntry) =>
-  `*${gameData.name.toUpperCase()}*
+const getText = (gameData: HowLongToBeatEntry) => {
+  const gameUrl = escapeMarkdown(getHLTBUrl(gameData.id));
+  const imageUrl = escapeMarkdown(getHLTBImageUrl(gameData.imageUrl));
+  const uppercaseName = escapeMarkdown(gameData.name.toUpperCase());
 
-*Main*: _${gameData.gameplayMain} h_
-*Main + Extras*: _${gameData.gameplayMainExtra} h_
-*Completionist*: _${gameData.gameplayCompletionist} h_
+  const gameNameLink = `[${uppercaseName}](${imageUrl})`;
 
-${getHLTBUrl(gameData.id)}`;
+  return `
+*${gameNameLink}*
+
+*Main*: _${escapeMarkdown(gameData.gameplayMain.toString())} h_
+*Main \\+ Extras*: _${escapeMarkdown(gameData.gameplayMainExtra.toString())} h_
+*Completionist*: _${escapeMarkdown(
+    gameData.gameplayCompletionist.toString(),
+  )} h_
+
+${gameUrl}
+  `;
+};
 
 const gameDataToArticle = (
   gameData: HowLongToBeatEntry,
@@ -28,8 +40,7 @@ const gameDataToArticle = (
   title: gameData.name,
   input_message_content: {
     message_text: getText(gameData),
-    disable_web_page_preview: true,
-    parse_mode: 'markdown',
+    parse_mode: 'markdownV2',
   },
   thumb_url: getHLTBImageUrl(gameData.imageUrl),
   url: getHLTBUrl(gameData.id),
@@ -41,8 +52,10 @@ const hltbService = new HowLongToBeatService();
 
 bot.on('inline_query', (inlineQuery) => {
   if (inlineQuery.query.length > 0) {
-    hltbService.search(inlineQuery.query).then((res) => {
-      const results = res.map((gameData) => gameDataToArticle(gameData));
+    hltbService.search(inlineQuery.query).then((queryResult) => {
+      const results = queryResult.map((gameData) =>
+        gameDataToArticle(gameData),
+      );
 
       bot.answerInlineQuery(inlineQuery.id, results);
     });
