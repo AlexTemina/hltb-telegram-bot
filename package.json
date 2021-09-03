@@ -20,8 +20,8 @@
   "main": "dist/index.js",
   "name": "how-long-to-beat-bot",
   "scripts": {
-    "start": "tsc && node dist/index.js",
-    "switch_to_dev": "export $(cat .env | xargs) && wget --spider https://api.telegram.org/bot$TOKEN/setWebhook?url= --delete-after && node dist/index.js"
+    "start": "tsc && node dist/src/index.js",
+    "switch_to_dev": "export $(cat .env | xargs) && wget --spider https://api.telegram.org/bot$TOKEN/setWebhook?url= --delete-after && node dist/src/index.js"
   },
   "version": "5.0.0",
   "volta": {

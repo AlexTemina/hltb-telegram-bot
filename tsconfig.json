@@ -5,7 +5,8 @@
     "target": "esNext",
     "moduleResolution": "node",
     "sourceMap": true,
-    "outDir": "dist"
+    "outDir": "dist",
+    "resolveJsonModule": true
   },
   "lib": ["esNext"]
 }
