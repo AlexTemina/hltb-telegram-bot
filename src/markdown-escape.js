@@ -1,7 +1,5 @@
-/* eslint-disable @typescript-eslint/explicit-module-boundary-types */
-
 // '_', '*', '[', ']', '(', ')', '~', '`', '>', '#', '+', '-', '=', '|', '{', '}', '.', '!'
-const replacements: [RegExp, string][] = [
+const replacements = [
   [/_/g, '\\_'],
   [/\*/g, '\\*'],
   [/\(/g, '\\('],
@@ -22,8 +20,12 @@ const replacements: [RegExp, string][] = [
   [/!/g, '\\!'],
 ];
 
-export const escapeMarkdown = (string: string): string => {
+const escapeMarkdown = (string) => {
   return replacements.reduce(function (string, replacement) {
     return string.replace(replacement[0], replacement[1]);
   }, string);
+};
+
+module.exports = {
+  escapeMarkdown,
 };
